@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -27,6 +28,8 @@ import {
   mergeConfig,
   mergeI18n,
 } from './editor-config';
+type EditorMode = 'wysiwyg' | 'html' | 'preview';
+const STORAGE_KEY = 'rich-text-editor.draft';
 
 @Component({
   selector: 'jhi-rich-text-editor',
@@ -37,7 +40,7 @@ import {
   providers: [EditorCommandService],
   imports: [CommonModule, EditorToolbarComponent],
 })
-export default class RichTextEditorComponent implements OnInit {
+export default class RichTextEditorComponent implements OnInit, AfterViewInit {
   /** HTML to display on first render. Consumers can pass either plain text or a full fragment. */
   readonly initialValue = input<string>('');
 
@@ -72,35 +75,20 @@ export default class RichTextEditorComponent implements OnInit {
 
   readonly resolvedConfig = computed(() => mergeConfig(this.config()));
   readonly labels = computed(() => mergeI18n(this.i18n()));
+  protected readonly editorHost = viewChild<ElementRef<HTMLDivElement>>('editorHost');
 
   private readonly destroyRef = inject(DestroyRef);
   private lastRegisteredElement: HTMLDivElement | null = null;
+  private editorMounted = false;
 
   constructor() {
-    // Re-register the editor and restore its content every time the contentEditable
-    // element is (re-)created by the @switch block in the template (mode round-trip).
-    // Effects run after inputs are bound, so reading `this.htmlContent()` here is safe.
+    // Keep `htmlContent` in sync with TipTap so `switchMode` can round-trip
+    // HTML without pulling from the editor imperatively.
     effect(() => {
-      const ref = this.editorRef();
-      const element = ref?.nativeElement ?? null;
-      if (!element || element === this.lastRegisteredElement) {
-        return;
+      this.editor.contentChanged();
+      if (this.mode() === 'wysiwyg' && this.editorMounted) {
+        this.htmlContent.set(this.editor.getHTML());
       }
-      this.lastRegisteredElement = element;
-      element.innerHTML = this.htmlContent();
-      this.editor.registerEditor(element);
-      this.editor.refreshState();
-    });
-
-    const onSelectionChange = (): void => {
-      const element = this.editorRef()?.nativeElement;
-      if (element && document.activeElement === element) {
-        this.editor.refreshState();
-      }
-    };
-    document.addEventListener('selectionchange', onSelectionChange);
-    this.destroyRef.onDestroy(() => {
-      document.removeEventListener('selectionchange', onSelectionChange);
     });
   }
 
@@ -127,14 +115,37 @@ export default class RichTextEditorComponent implements OnInit {
     }
   }
 
+  ngAfterViewInit(): void {
+    const host = this.editorHost()?.nativeElement;
+    if (!host || this.editorMounted) {
+      return;
+    }
+    this.editor.init(host, this.htmlContent());
+    this.editorMounted = true;
+    this.htmlContent.set(this.editor.getHTML());
+    this.editor.registerEditorElement(host);
+  }
+
+  switchMode(mode: EditorMode): void {
+    const current = this.mode();
+    if (current === mode) {
+      return;
+    }
+    if (current === 'wysiwyg' && this.editorMounted) {
+      this.htmlContent.set(this.editor.getHTML());
+    }
+    if (current === 'html' && mode !== 'html' && this.editorMounted) {
+      this.editor.setContent(this.htmlContent());
+    }
+    this.mode.set(mode);
+  }
+
   onEditorInput(): void {
     const element = this.editorRef()?.nativeElement;
     if (!element) {
       return;
     }
     this.htmlContent.set(element.innerHTML);
-    this.editor.refreshState();
-    this.contentChange.emit(element.innerHTML);
   }
 
   onEditorBlur(): void {
@@ -145,119 +156,56 @@ export default class RichTextEditorComponent implements OnInit {
     this.htmlContent.set(element.innerHTML);
   }
 
-  onHtmlInput(event: Event): void {
-    const target = event.target as HTMLTextAreaElement;
-    this.htmlContent.set(target.value);
-    this.contentChange.emit(target.value);
-  }
-
   applyHtml(): void {
-    // Switch back to WYSIWYG; the effect() above will restore innerHTML on the new element.
-    this.lastRegisteredElement = null;
-    this.mode.set('wysiwyg');
+    if (this.editorMounted) {
+      this.editor.setContent(this.htmlContent());
+    }
   }
 
-  switchMode(mode: EditorViewMode): void {
-    if (mode === this.mode()) {
-      return;
-    }
-    if (this.mode() === 'wysiwyg') {
-      const element = this.editorRef()?.nativeElement;
-      if (element) {
-        this.htmlContent.set(element.innerHTML);
-      }
-    }
-    // Force the effect to re-init the next WYSIWYG element when it (re-)appears.
-    this.lastRegisteredElement = null;
-    this.mode.set(mode);
+  onHtmlInput(value: Event): void {
+    const v = (value.target as HTMLInputElement).value;
+    this.htmlContent.set(v);
   }
 
   saveDraft(): void {
-    if (this.mode() === 'wysiwyg') {
-      // Only in WYSIWYG mode is the contentEditable element the source of truth.
-      // In 'html' mode, onHtmlInput already keeps htmlContent() up to date; in
-      // 'preview' mode, nothing can be edited. Reading from editorRef here in
-      // any other mode would either clobber user edits with a stale snapshot
-      // (from a detached node) or simply no-op.
-      const element = this.editorRef()?.nativeElement;
-      if (element) {
-        this.htmlContent.set(element.innerHTML);
-      }
+    const html =
+      this.mode() === 'wysiwyg' && this.editorMounted ? this.editor.getHTML() : this.htmlContent();
+    try {
+      localStorage.setItem(STORAGE_KEY, html);
+      this.htmlContent.set(html);
+      this.savedAt.set(new Date());
+    } catch {
+      // localStorage can throw in private browsing / quota exceeded; silently
+      // degrade so the click still feels responsive.
     }
-    const key = this.resolvedConfig().storageKey;
-    const html = this.htmlContent();
-    if (key) {
-      try {
-        localStorage.setItem(key, html);
-      } catch (error) {
-        console.error('Unable to save draft', error);
-      }
-    }
-    this.savedAt.set(new Date());
-    this.draftSaved.emit(html);
-  }
-
-  clearAll(): void {
-    this.editor.reset();
-    this.htmlContent.set('');
-    const element = this.editorRef()?.nativeElement;
-    if (element) {
-      element.innerHTML = '';
-    }
-    const key = this.resolvedConfig().storageKey;
-    if (key) {
-      try {
-        localStorage.removeItem(key);
-      } catch (error) {
-        console.error('Unable to clear draft', error);
-      }
-    }
-    this.savedAt.set(null);
-    this.contentChange.emit('');
   }
 
   copyHtml(): void {
-    void navigator.clipboard.writeText(this.htmlContent());
+    const html =
+      this.mode() === 'wysiwyg' && this.editorMounted ? this.editor.getHTML() : this.htmlContent();
+    void navigator.clipboard.writeText(html);
   }
 
-  /** Expose the raw sanitized HTML for programmatic access (e.g. form integrations). */
-  getHtml(): string {
-    return this.htmlContent();
+  clearAll(): void {
+    this.editor.setContent('<p></p>');
+    this.htmlContent.set('<p></p>');
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // ignore
+    }
+    this.savedAt.set(null);
   }
 
   @HostListener('document:keydown', ['$event'])
   onKeydown(event: KeyboardEvent): void {
-    if (!event.ctrlKey && !event.metaKey) {
+    const target = event.target as HTMLElement | null;
+    if (!target?.closest('jhi-rich-text-editor')) {
       return;
     }
-    const key = event.key.toLowerCase();
-    if (key === 's') {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
       event.preventDefault();
       this.saveDraft();
-      return;
-    }
-    // Google Docs-style block format shortcuts: Ctrl+Alt+0..4 pick paragraph
-    // and H1..H4 respectively. We intentionally only bind them when the
-    // contentEditable WYSIWYG view is active and focused, so raw HTML / preview
-    // modes don't accidentally intercept the user's keys.
-    if (this.mode() !== 'wysiwyg' || !event.altKey) {
-      return;
-    }
-    const element = this.editorRef()?.nativeElement;
-    if (!element || document.activeElement !== element) {
-      return;
-    }
-    const mapping: Partial<Record<string, BlockFormat>> = {
-      '0': 'p',
-      '1': 'h1',
-      '2': 'h2',
-      '3': 'h3',
-      '4': 'h4',
-    };
-    const target = mapping[event.key];
-    if (target) {
-      event.preventDefault();
-      this.editor.setBlock(target);
     }
   }
 
