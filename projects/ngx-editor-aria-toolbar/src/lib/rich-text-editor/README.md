@@ -84,6 +84,28 @@ interface ToolbarSections {
 All fields are optional; `mergeConfig()` fills in
 [`DEFAULT_CONFIG`](./editor-config.ts) for anything you skip.
 
+### Example: Minimalist Configuration
+
+You can restrict the editor to a "Lite" mode by disabling specific toolbar sections and modes:
+
+```ts
+const liteConfig: RichTextEditorConfig = {
+  modes: ['wysiwyg', 'preview'], // No HTML source mode
+  showFooter: false,             // No word counters or action buttons
+  toolbar: {
+    history: false,              // No undo/redo
+    colors: false,               // No text/highlight colors
+    insert: false,               // No links/images
+    utilities: false             // No clear format/fullscreen
+  }
+};
+```
+
+Usage in template:
+```html
+<jhi-rich-text-editor [config]="liteConfig" [(ngModel)]="content"></jhi-rich-text-editor>
+```
+
 ## `RichTextEditorI18n`
 
 Every user-visible string passes through this object. You can supply a
