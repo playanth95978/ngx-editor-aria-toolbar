@@ -1,12 +1,24 @@
 {
   "name": "ngx-editor-aria-toolbar",
   "version": "0.0.1",
-  "peerDependencies": {
-    "@angular/common": "^21.2.0",
-    "@angular/core": "^21.2.0"
-  },
   "dependencies": {
     "tslib": "^2.3.0"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "peerDependencies": {
+    "@angular/core": "^17 || ^18 || ^19 || ^20 || ^21",
+    "@angular/common": "^17 || ^18 || ^19 || ^20 || ^21",
+    "@angular/forms": "^17 || ^18 || ^19 || ^20 || ^21",
+    "@angular/aria": "^21",
+    "@tiptap/core": "^3",
+    "@tiptap/starter-kit": "^3",
+    "@tiptap/extension-text-align": "^3",
+    "@tiptap/extension-text-style": "^3",
+    "@tiptap/extension-color": "^3",
+    "@tiptap/extension-highlight": "^3",
+    "@tiptap/extension-image": "^3",
+    "@tiptap/extension-link": "^3",
+    "@tiptap/extension-underline": "^3",
+    "@ngx-translate/core": "^17"
+  }
 }
