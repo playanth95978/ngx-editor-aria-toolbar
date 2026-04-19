@@ -10,39 +10,39 @@
         <p class="rte-subtitle">{{ t.subtitle }}</p>
       </div>
       @if (cfg.modes.length > 1) {
-        <div class="rte-modes" role="tablist" aria-label="Editor mode">
+        <div aria-label="Editor mode" class="rte-modes" role="tablist">
           @if (isModeEnabled('wysiwyg')) {
             <button
-              type="button"
-              role="tab"
-              class="mode-btn"
-              [class.active]="currentMode === 'wysiwyg'"
-              [attr.aria-selected]="currentMode === 'wysiwyg'"
               (click)="switchMode('wysiwyg')"
+              [attr.aria-selected]="currentMode === 'wysiwyg'"
+              [class.active]="currentMode === 'wysiwyg'"
+              class="mode-btn"
+              role="tab"
+              type="button"
             >
               <span>{{ t.modes.wysiwyg }}</span>
             </button>
           }
           @if (isModeEnabled('html')) {
             <button
-              type="button"
-              role="tab"
-              class="mode-btn"
-              [class.active]="currentMode === 'html'"
-              [attr.aria-selected]="currentMode === 'html'"
               (click)="switchMode('html')"
+              [attr.aria-selected]="currentMode === 'html'"
+              [class.active]="currentMode === 'html'"
+              class="mode-btn"
+              role="tab"
+              type="button"
             >
               <span>{{ t.modes.html }}</span>
             </button>
           }
           @if (isModeEnabled('preview')) {
             <button
-              type="button"
-              role="tab"
-              class="mode-btn"
-              [class.active]="currentMode === 'preview'"
-              [attr.aria-selected]="currentMode === 'preview'"
               (click)="switchMode('preview')"
+              [attr.aria-selected]="currentMode === 'preview'"
+              [class.active]="currentMode === 'preview'"
+              class="mode-btn"
+              role="tab"
+              type="button"
             >
               <span>{{ t.modes.preview }}</span>
             </button>
@@ -52,41 +52,33 @@
     </header>
   }
 
-  <jhi-editor-toolbar [sections]="cfg.toolbar" [i18n]="i18n()" (clearRequested)="clearAll()"></jhi-editor-toolbar>
+  <jhi-editor-toolbar (clearRequested)="clearAll()" [i18n]="i18n()" [sections]="cfg.toolbar"></jhi-editor-toolbar>
 
   <div class="rte-surface">
-    @switch (currentMode) {
-      @case ('wysiwyg') {
-        <div
-          #editor
-          class="rte-editor"
-          role="textbox"
-          aria-multiline="true"
-          aria-label="Rich text content"
-          contenteditable="true"
-          spellcheck="true"
-          (input)="onEditorInput()"
-          (blur)="onEditorBlur()"
-        ></div>
-      }
-      @case ('html') {
-        <div class="rte-html-wrapper">
-          <label class="visually-hidden" for="htmlSource">{{ t.modes.html }}</label>
-          <textarea id="htmlSource" class="rte-html" spellcheck="false" [value]="htmlContent()" (input)="onHtmlInput($event)"></textarea>
-          <button type="button" class="btn-secondary" (click)="applyHtml()">
-            <span>{{ t.actions.applyHtml }}</span>
-          </button>
-        </div>
-      }
-      @case ('preview') {
-        <article class="rte-preview" [innerHTML]="htmlContent()"></article>
-      }
-    }
+    <div
+      #editor
+      [hidden]="currentMode !== 'wysiwyg'"
+      aria-label="Rich text content"
+      aria-multiline="true"
+      class="rte-editor"
+      role="textbox"
+      spellcheck="true"
+    ></div>
+
+    <div class="rte-html-wrapper" [hidden]="currentMode !== 'html'">
+      <label class="visually-hidden" for="htmlSource">{{ t.modes.html }}</label>
+      <textarea (input)="onHtmlInput($event)" [value]="htmlContent()" class="rte-html" id="htmlSource" spellcheck="false"></textarea>
+      <button (click)="applyHtml()" class="btn-secondary" type="button">
+        <span>{{ t.actions.applyHtml }}</span>
+      </button>
+    </div>
+
+    <article [innerHTML]="htmlContent()" class="rte-preview" [hidden]="currentMode !== 'preview'"></article>
   </div>
 
   @if (cfg.showFooter) {
     <footer class="rte-footer">
-      <div class="counters" aria-live="polite">
+      <div aria-live="polite" class="counters">
         <span>
           <strong>{{ wordCount() }}</strong>
           <span>{{ t.stats.words }}</span>
@@ -104,12 +96,12 @@
       </div>
       <div class="actions">
         @if (cfg.showCopyButton) {
-          <button type="button" class="btn-secondary" (click)="copyHtml()">
+          <button (click)="copyHtml()" class="btn-secondary" type="button">
             <span>{{ t.actions.copyHtml }}</span>
           </button>
         }
         @if (cfg.showSaveButton) {
-          <button type="button" class="btn-primary" (click)="saveDraft()">
+          <button (click)="saveDraft()" class="btn-primary" type="button">
             <span>{{ t.actions.save }}</span>
           </button>
         }

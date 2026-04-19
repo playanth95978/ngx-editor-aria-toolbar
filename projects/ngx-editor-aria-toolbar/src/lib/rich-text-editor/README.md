@@ -21,11 +21,7 @@ infrastructure.
 ## Install & import
 
 ```ts
-import {
-  RichTextEditorComponent,
-  type RichTextEditorConfig,
-  type RichTextEditorI18n,
-} from 'app/rich-text-editor/public-api';
+import { RichTextEditorComponent, type RichTextEditorConfig, type RichTextEditorI18n } from 'app/rich-text-editor/public-api';
 
 @Component({
   imports: [RichTextEditorComponent],
@@ -52,8 +48,12 @@ export class MyHostComponent {
     actions: { save: 'Save my post' },
   };
 
-  onChange(html: string) { /* … */ }
-  persist(html: string) { /* … */ }
+  onChange(html: string) {
+    /* … */
+  }
+  persist(html: string) {
+    /* … */
+  }
 }
 ```
 
@@ -63,26 +63,26 @@ toolbar with all three modes, the default storage key, etc.
 
 ## Public API
 
-| Export | Description |
-|---|---|
-| `RichTextEditorComponent` | Main standalone component. Inputs: `initialValue`, `config`, `i18n`. Outputs: `contentChange`, `draftSaved`. |
-| `EditorToolbarComponent` | Standalone toolbar. Usable on its own if you want to render the editor surface yourself — wire it to an `EditorCommandService` instance. |
-| `EditorCommandService` | The command engine. Inject in a host and call `registerEditor(divEl)`, then `toggleBold()` / `setBlock('h1')` / `unorderedList()` / … |
-| `BlockFormat`, `EditorState` | Types exposed by the service. |
-| `RichTextEditorConfig`, `RichTextEditorI18n`, `ToolbarSections` | Configuration types. |
-| `DEFAULT_CONFIG`, `DEFAULT_I18N`, `mergeConfig`, `mergeI18n` | Defaults + deep-merge helpers for consumers that want to compose partial overrides. |
+| Export                                                          | Description                                                                                                                              |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `RichTextEditorComponent`                                       | Main standalone component. Inputs: `initialValue`, `config`, `i18n`. Outputs: `contentChange`, `draftSaved`.                             |
+| `EditorToolbarComponent`                                        | Standalone toolbar. Usable on its own if you want to render the editor surface yourself — wire it to an `EditorCommandService` instance. |
+| `EditorCommandService`                                          | The command engine. Inject in a host and call `registerEditor(divEl)`, then `toggleBold()` / `setBlock('h1')` / `unorderedList()` / …    |
+| `BlockFormat`, `EditorState`                                    | Types exposed by the service.                                                                                                            |
+| `RichTextEditorConfig`, `RichTextEditorI18n`, `ToolbarSections` | Configuration types.                                                                                                                     |
+| `DEFAULT_CONFIG`, `DEFAULT_I18N`, `mergeConfig`, `mergeI18n`    | Defaults + deep-merge helpers for consumers that want to compose partial overrides.                                                      |
 
 ## `RichTextEditorConfig`
 
 ```ts
 interface RichTextEditorConfig {
   modes?: ('wysiwyg' | 'html' | 'preview')[]; // subset + initial mode
-  showHeader?: boolean;                        // hide title + subtitle
-  showFooter?: boolean;                        // hide counters + action row
+  showHeader?: boolean; // hide title + subtitle
+  showFooter?: boolean; // hide counters + action row
   showSaveButton?: boolean;
   showCopyButton?: boolean;
-  storageKey?: string | null;                  // null disables auto-load
-  toolbar?: ToolbarSections;                   // per-group visibility
+  storageKey?: string | null; // null disables auto-load
+  toolbar?: ToolbarSections; // per-group visibility
 }
 
 interface ToolbarSections {
@@ -122,7 +122,7 @@ consumers style the component via ordinary CSS cascade (the selectors are
 ## Roadmap / not in scope
 
 - Publish as a standalone npm package with its own Angular workspace (`ng
-  generate library`). That requires `angular.json` changes that touch the
+generate library`). That requires `angular.json` changes that touch the
   JHipster build; intentionally deferred.
 - Unit tests on the toolbar component.
 - Optional Markdown mode.

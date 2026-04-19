@@ -3,37 +3,37 @@
 @let t = labels();
 
 <div
-  ngToolbar
-  class="editor-toolbar"
-  aria-label="Rich text editor toolbar"
-  role="toolbar"
   (mousedown)="onToolbarMouseDown($event)"
   (pointerdown)="onToolbarPointerDown($event)"
+  aria-label="Rich text editor toolbar"
+  class="editor-toolbar"
+  ngToolbar
+  role="toolbar"
 >
   @if (v.history) {
-    <div class="group" aria-label="History">
-      <button ngToolbarWidget value="undo" type="button" class="tb-btn" aria-label="Undo" title="Undo (Ctrl+Z)" (click)="editor.undo()">
+    <div aria-label="History" class="group">
+      <button (click)="editor.undo()" aria-label="Undo" class="tb-btn" ngToolbarWidget title="Undo (Ctrl+Z)" type="button" value="undo">
         <span aria-hidden="true">↶</span>
       </button>
-      <button ngToolbarWidget value="redo" type="button" class="tb-btn" aria-label="Redo" title="Redo (Ctrl+Y)" (click)="editor.redo()">
+      <button (click)="editor.redo()" aria-label="Redo" class="tb-btn" ngToolbarWidget title="Redo (Ctrl+Y)" type="button" value="redo">
         <span aria-hidden="true">↷</span>
       </button>
     </div>
   }
 
   @if (v.history && v.blockFormat) {
-    <div class="separator" role="separator" aria-orientation="vertical"></div>
+    <div aria-orientation="vertical" class="separator" role="separator"></div>
   }
 
   @if (v.blockFormat) {
-    <div class="group" aria-label="Block format">
+    <div aria-label="Block format" class="group">
       <label class="visually-hidden" for="blockFormat">{{ t.toolbar.blockFormatLabel }}</label>
       <select
-        id="blockFormat"
-        class="tb-select"
+        (ngModelChange)="onBlockChange($event)"
         [attr.aria-label]="t.toolbar.blockFormatLabel"
         [ngModel]="s.block"
-        (ngModelChange)="onBlockChange($event)"
+        class="tb-select"
+        id="blockFormat"
       >
         @for (b of blocks(); track b.value) {
           <option [value]="b.value">{{ b.label }}</option>
@@ -43,60 +43,62 @@
   }
 
   @if (v.blockFormat && v.inline) {
-    <div class="separator" role="separator" aria-orientation="vertical"></div>
+    <div aria-orientation="vertical" class="separator" role="separator"></div>
   }
 
   @if (v.inline) {
-    <div class="group" aria-label="Inline formatting">
+    {{ s.bold }}
+
+    <div aria-label="Inline formatting" class="group">
       <button
-        ngToolbarWidget
-        value="bold"
-        type="button"
         #bold="ngToolbarWidget"
-        class="tb-btn"
-        aria-label="Bold"
-        title="Bold (Ctrl+B)"
-        [attr.aria-pressed]="s.bold || bold.selected()"
         (click)="editor.toggleBold()"
+        [attr.aria-pressed]="s.bold"
+        aria-label="Bold"
+        class="tb-btn"
+        ngToolbarWidget
+        title="Bold (Ctrl+B)"
+        type="button"
+        value="bold"
       >
         <strong aria-hidden="true">B</strong>
       </button>
       <button
-        ngToolbarWidget
-        value="italic"
-        type="button"
         #italic="ngToolbarWidget"
-        class="tb-btn"
-        aria-label="Italic"
-        title="Italic (Ctrl+I)"
-        [attr.aria-pressed]="s.italic || italic.selected()"
         (click)="editor.toggleItalic()"
+        [attr.aria-pressed]="s.italic "
+        aria-label="Italic"
+        class="tb-btn"
+        ngToolbarWidget
+        title="Italic (Ctrl+I)"
+        type="button"
+        value="italic"
       >
         <em aria-hidden="true">I</em>
       </button>
       <button
-        ngToolbarWidget
-        value="underline"
-        type="button"
         #underline="ngToolbarWidget"
-        class="tb-btn"
-        aria-label="Underline"
-        title="Underline (Ctrl+U)"
-        [attr.aria-pressed]="s.underline || underline.selected()"
         (click)="editor.toggleUnderline()"
+        [attr.aria-pressed]="s.underline "
+        aria-label="Underline"
+        class="tb-btn"
+        ngToolbarWidget
+        title="Underline (Ctrl+U)"
+        type="button"
+        value="underline"
       >
-        <span class="underlined" aria-hidden="true">U</span>
+        <span aria-hidden="true" class="underlined">U</span>
       </button>
       <button
-        ngToolbarWidget
-        value="strike"
-        type="button"
         #strike="ngToolbarWidget"
-        class="tb-btn"
-        aria-label="Strikethrough"
-        title="Strikethrough"
-        [attr.aria-pressed]="s.strikeThrough || strike.selected()"
         (click)="editor.toggleStrikeThrough()"
+        [attr.aria-pressed]="s.strikeThrough "
+        aria-label="Strikethrough"
+        class="tb-btn"
+        ngToolbarWidget
+        title="Strikethrough"
+        type="button"
+        value="strike"
       >
         <s aria-hidden="true">S</s>
       </button>
@@ -104,64 +106,64 @@
   }
 
   @if (v.inline && v.alignment) {
-    <div class="separator" role="separator" aria-orientation="vertical"></div>
+    <div aria-orientation="vertical" class="separator" role="separator"></div>
   }
 
   @if (v.alignment) {
-    <div ngToolbarWidgetGroup role="radiogroup" class="group" aria-label="Text alignment">
+    <div aria-label="Text alignment" class="group" ngToolbarWidgetGroup role="radiogroup">
       <button
+        #alignLeft="ngToolbarWidget"
+        (click)="editor.setAlignment('Left')"
+        [attr.aria-checked]="s.alignLeft "
+        aria-label="Align left"
+        class="tb-btn"
         ngToolbarWidget
         role="radio"
+        title="Align left"
         type="button"
         value="align-left"
-        #alignLeft="ngToolbarWidget"
-        class="tb-btn"
-        aria-label="Align left"
-        title="Align left"
-        [attr.aria-checked]="s.alignLeft || alignLeft.selected()"
-        (click)="editor.setAlignment('Left')"
       >
         <span aria-hidden="true">⯇</span>
       </button>
       <button
+        #alignCenter="ngToolbarWidget"
+        (click)="editor.setAlignment('Center')"
+        [attr.aria-checked]="s.alignCenter "
+        aria-label="Align center"
+        class="tb-btn"
         ngToolbarWidget
         role="radio"
+        title="Align center"
         type="button"
         value="align-center"
-        #alignCenter="ngToolbarWidget"
-        class="tb-btn"
-        aria-label="Align center"
-        title="Align center"
-        [attr.aria-checked]="s.alignCenter || alignCenter.selected()"
-        (click)="editor.setAlignment('Center')"
       >
         <span aria-hidden="true">≡</span>
       </button>
       <button
+        #alignRight="ngToolbarWidget"
+        (click)="editor.setAlignment('Right')"
+        [attr.aria-checked]="s.alignRight "
+        aria-label="Align right"
+        class="tb-btn"
         ngToolbarWidget
         role="radio"
+        title="Align right"
         type="button"
         value="align-right"
-        #alignRight="ngToolbarWidget"
-        class="tb-btn"
-        aria-label="Align right"
-        title="Align right"
-        [attr.aria-checked]="s.alignRight || alignRight.selected()"
-        (click)="editor.setAlignment('Right')"
       >
         <span aria-hidden="true">⯈</span>
       </button>
       <button
+        #alignJustify="ngToolbarWidget"
+        (click)="editor.setAlignment('Justify')"
+        [attr.aria-checked]="s.alignJustify "
+        aria-label="Justify"
+        class="tb-btn"
         ngToolbarWidget
         role="radio"
+        title="Justify"
         type="button"
         value="align-justify"
-        #alignJustify="ngToolbarWidget"
-        class="tb-btn"
-        aria-label="Justify"
-        title="Justify"
-        [attr.aria-checked]="s.alignJustify || alignJustify.selected()"
-        (click)="editor.setAlignment('Justify')"
       >
         <span aria-hidden="true">☰</span>
       </button>
@@ -169,56 +171,56 @@
   }
 
   @if (v.alignment && v.lists) {
-    <div class="separator" role="separator" aria-orientation="vertical"></div>
+    <div aria-orientation="vertical" class="separator" role="separator"></div>
   }
 
   @if (v.lists) {
-    <div class="group" aria-label="Lists">
+    <div aria-label="Lists" class="group">
       <button
-        ngToolbarWidget
-        value="ul"
-        type="button"
         #ul="ngToolbarWidget"
-        class="tb-btn"
-        aria-label="Bulleted list"
-        title="Bulleted list"
-        [attr.aria-pressed]="s.unorderedList || ul.selected()"
         (click)="editor.unorderedList()"
+        [attr.aria-pressed]="s.unorderedList "
+        aria-label="Bulleted list"
+        class="tb-btn"
+        ngToolbarWidget
+        title="Bulleted list"
+        type="button"
+        value="ul"
       >
         <span aria-hidden="true">•</span>
       </button>
       <button
-        ngToolbarWidget
-        value="ol"
-        type="button"
         #ol="ngToolbarWidget"
-        class="tb-btn"
-        aria-label="Numbered list"
-        title="Numbered list"
-        [attr.aria-pressed]="s.orderedList || ol.selected()"
         (click)="editor.orderedList()"
+        [attr.aria-pressed]="s.orderedList "
+        aria-label="Numbered list"
+        class="tb-btn"
+        ngToolbarWidget
+        title="Numbered list"
+        type="button"
+        value="ol"
       >
         <span aria-hidden="true">1.</span>
       </button>
       <button
-        ngToolbarWidget
-        value="outdent"
-        type="button"
-        class="tb-btn"
-        aria-label="Decrease indent"
-        title="Decrease indent"
         (click)="editor.outdent()"
+        aria-label="Decrease indent"
+        class="tb-btn"
+        ngToolbarWidget
+        title="Decrease indent"
+        type="button"
+        value="outdent"
       >
         <span aria-hidden="true">⇤</span>
       </button>
       <button
-        ngToolbarWidget
-        value="indent"
-        type="button"
-        class="tb-btn"
-        aria-label="Increase indent"
-        title="Increase indent"
         (click)="editor.indent()"
+        aria-label="Increase indent"
+        class="tb-btn"
+        ngToolbarWidget
+        title="Increase indent"
+        type="button"
+        value="indent"
       >
         <span aria-hidden="true">⇥</span>
       </button>
@@ -226,71 +228,71 @@
   }
 
   @if (v.lists && v.colors) {
-    <div class="separator" role="separator" aria-orientation="vertical"></div>
+    <div aria-orientation="vertical" class="separator" role="separator"></div>
   }
 
   @if (v.colors) {
-    <div class="group" aria-label="Colors">
-      <label class="color-field" [title]="t.toolbar.foreColor">
+    <div aria-label="Colors" class="group">
+      <label [title]="t.toolbar.foreColor" class="color-field">
         <span class="visually-hidden">{{ t.toolbar.foreColor }}</span>
-        <span class="color-swatch" [style.background]="s.foreColor" aria-hidden="true">A</span>
-        <input type="color" class="color-input" [value]="s.foreColor" (change)="onForeColorChange($event)" />
+        <span [style.background]="s.foreColor" aria-hidden="true" class="color-swatch">A</span>
+        <input (change)="onForeColorChange($event)" [value]="s.foreColor" class="color-input" type="color" />
       </label>
-      <label class="color-field" [title]="t.toolbar.backColor">
+      <label [title]="t.toolbar.backColor" class="color-field">
         <span class="visually-hidden">{{ t.toolbar.backColor }}</span>
-        <span class="color-swatch swatch-bg" [style.background]="s.backColor" aria-hidden="true">H</span>
-        <input type="color" class="color-input" [value]="s.backColor" (change)="onBackColorChange($event)" />
+        <span [style.background]="s.backColor" aria-hidden="true" class="color-swatch swatch-bg">H</span>
+        <input (change)="onBackColorChange($event)" [value]="s.backColor" class="color-input" type="color" />
       </label>
     </div>
   }
 
   @if (v.colors && v.insert) {
-    <div class="separator" role="separator" aria-orientation="vertical"></div>
+    <div aria-orientation="vertical" class="separator" role="separator"></div>
   }
 
   @if (v.insert) {
-    <div class="group" aria-label="Insert">
+    <div aria-label="Insert" class="group">
       <button
-        ngToolbarWidget
-        value="link"
-        type="button"
-        class="tb-btn"
-        aria-label="Insert link"
-        title="Insert link"
         (click)="onCreateLink()"
+        aria-label="Insert link"
+        class="tb-btn"
+        ngToolbarWidget
+        title="Insert link"
+        type="button"
+        value="link"
       >
         <span aria-hidden="true">🔗</span>
       </button>
       <button
-        ngToolbarWidget
-        value="unlink"
-        type="button"
-        class="tb-btn"
-        aria-label="Remove link"
-        title="Remove link"
         (click)="editor.unlink()"
+        aria-label="Remove link"
+        class="tb-btn"
+        ngToolbarWidget
+        title="Remove link"
+        type="button"
+        value="unlink"
       >
         <span aria-hidden="true">⛓</span>
       </button>
       <button
-        ngToolbarWidget
-        value="image"
-        type="button"
-        class="tb-btn"
-        aria-label="Insert image"
-        title="Insert image"
         (click)="onInsertImage()"
+        aria-label="Insert image"
+        class="tb-btn"
+        ngToolbarWidget
+        title="Insert image"
+        type="button"
+        value="image"
       >
         <span aria-hidden="true">🖼</span>
       </button>
       <button
-        ngToolbarWidget
-        value="hr"
-        type="button"
-        class="tb-btn"
-        aria-label="Insert horizontal rule"
-        title="Insert horizontal rule"
         (click)="editor.insertHorizontalRule()"
+        aria-label="Insert horizontal rule"
+        class="tb-btn"
+        ngToolbarWidget
+        title="Insert horizontal rule"
+        type="button"
+        value="hr"
       >
         <span aria-hidden="true">―</span>
       </button>
@@ -298,30 +300,30 @@
   }
 
   @if (v.insert && v.utilities) {
-    <div class="separator" role="separator" aria-orientation="vertical"></div>
+    <div aria-orientation="vertical" class="separator" role="separator"></div>
   }
 
   @if (v.utilities) {
-    <div class="group" aria-label="Utilities">
+    <div aria-label="Utilities" class="group">
       <button
-        ngToolbarWidget
-        value="clear-format"
-        type="button"
-        class="tb-btn"
-        aria-label="Clear formatting"
-        title="Clear formatting"
         (click)="editor.removeFormat()"
+        aria-label="Clear formatting"
+        class="tb-btn"
+        ngToolbarWidget
+        title="Clear formatting"
+        type="button"
+        value="clear-format"
       >
         <span aria-hidden="true">🧹</span>
       </button>
       <button
-        ngToolbarWidget
-        value="clear-all"
-        type="button"
-        class="tb-btn tb-btn-danger"
-        aria-label="Clear all content"
-        title="Clear all content"
         (click)="onClearAll()"
+        aria-label="Clear all content"
+        class="tb-btn tb-btn-danger"
+        ngToolbarWidget
+        title="Clear all content"
+        type="button"
+        value="clear-all"
       >
         <span aria-hidden="true">🗑</span>
       </button>

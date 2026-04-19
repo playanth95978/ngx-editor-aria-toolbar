@@ -3,7 +3,7 @@ import { Toolbar, ToolbarWidget, ToolbarWidgetGroup } from '@angular/aria/toolba
 import { FormsModule } from '@angular/forms';
 
 import { BlockFormat, EditorCommandService } from '../../services/editor-command.service';
-import { DEFAULT_CONFIG, DEFAULT_I18N, RichTextEditorI18n, ToolbarSections, mergeI18n, type DeepPartial } from '../../editor-config';
+import { type DeepPartial, DEFAULT_CONFIG, DEFAULT_I18N, mergeI18n, RichTextEditorI18n, ToolbarSections } from '../../editor-config';
 
 @Component({
   selector: 'jhi-editor-toolbar',

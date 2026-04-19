@@ -18,16 +18,17 @@ import {
 import { CommonModule } from '@angular/common';
 
 import { EditorToolbarComponent } from './components/editor-toolbar/editor-toolbar';
-import { BlockFormat, EditorCommandService } from './services/editor-command.service';
+import { EditorCommandService } from './services/editor-command.service';
 import {
-  DEFAULT_I18N,
   type DeepPartial,
+  DEFAULT_I18N,
   type EditorViewMode,
-  type RichTextEditorConfig,
-  type RichTextEditorI18n,
   mergeConfig,
   mergeI18n,
+  type RichTextEditorConfig,
+  type RichTextEditorI18n,
 } from './editor-config';
+
 type EditorMode = 'wysiwyg' | 'html' | 'preview';
 const STORAGE_KEY = 'rich-text-editor.draft';
 
@@ -60,23 +61,23 @@ export default class RichTextEditorComponent implements OnInit, AfterViewInit {
    */
   readonly draftSaved = output<string>();
 
-  readonly editorRef = viewChild<ElementRef<HTMLDivElement>>('editor');
+  protected readonly editorHost = viewChild<ElementRef<HTMLDivElement>>('editor');
 
   readonly editor = inject(EditorCommandService);
   readonly mode = signal<EditorViewMode>('wysiwyg');
   readonly htmlContent = signal<string>('');
-  readonly wordCount = computed(() => {
-    const text = this.htmlContent().replace(/<[^>]+>/g, ' ');
-    const words = text.trim().split(/\s+/).filter(Boolean);
-    return words.length;
+  readonly wordCount = computed<number>(() => {
+    this.editor.contentChanged();
+    return this.editor.getWordCount();
   });
-  readonly charCount = computed(() => this.htmlContent().replace(/<[^>]+>/g, '').length);
+  readonly charCount = computed<number>(() => {
+    this.editor.contentChanged();
+    return this.editor.getTextLength();
+  });
   readonly savedAt = signal<Date | null>(null);
 
   readonly resolvedConfig = computed(() => mergeConfig(this.config()));
   readonly labels = computed(() => mergeI18n(this.i18n()));
-  protected readonly editorHost = viewChild<ElementRef<HTMLDivElement>>('editorHost');
-
   private readonly destroyRef = inject(DestroyRef);
   private lastRegisteredElement: HTMLDivElement | null = null;
   private editorMounted = false;
@@ -140,22 +141,6 @@ export default class RichTextEditorComponent implements OnInit, AfterViewInit {
     this.mode.set(mode);
   }
 
-  onEditorInput(): void {
-    const element = this.editorRef()?.nativeElement;
-    if (!element) {
-      return;
-    }
-    this.htmlContent.set(element.innerHTML);
-  }
-
-  onEditorBlur(): void {
-    const element = this.editorRef()?.nativeElement;
-    if (!element) {
-      return;
-    }
-    this.htmlContent.set(element.innerHTML);
-  }
-
   applyHtml(): void {
     if (this.editorMounted) {
       this.editor.setContent(this.htmlContent());
@@ -168,8 +153,7 @@ export default class RichTextEditorComponent implements OnInit, AfterViewInit {
   }
 
   saveDraft(): void {
-    const html =
-      this.mode() === 'wysiwyg' && this.editorMounted ? this.editor.getHTML() : this.htmlContent();
+    const html = this.mode() === 'wysiwyg' && this.editorMounted ? this.editor.getHTML() : this.htmlContent();
     try {
       localStorage.setItem(STORAGE_KEY, html);
       this.htmlContent.set(html);
@@ -181,8 +165,7 @@ export default class RichTextEditorComponent implements OnInit, AfterViewInit {
   }
 
   copyHtml(): void {
-    const html =
-      this.mode() === 'wysiwyg' && this.editorMounted ? this.editor.getHTML() : this.htmlContent();
+    const html = this.mode() === 'wysiwyg' && this.editorMounted ? this.editor.getHTML() : this.htmlContent();
     void navigator.clipboard.writeText(html);
   }
 

@@ -90,14 +90,13 @@ export class EditorCommandService {
   private readonly destroyRef = inject(DestroyRef);
   private editorElement: HTMLElement | null = null;
   private boundFocusOut: ((e: FocusEvent) => void) | null = null;
+  private expectingToolbarSteal = false;
+
+  // === FOCUS TOOLBAR HANDLING (Angular Aria compatible) ===
 
   constructor() {
     this.destroyRef.onDestroy(() => this.destroy());
   }
-
-  // === FOCUS TOOLBAR HANDLING (Angular Aria compatible) ===
-
-  private expectingToolbarSteal = false;
 
   /**
    * À appeler UNE FOIS après init(editorElement)
@@ -121,8 +120,7 @@ export class EditorCommandService {
 
       // snapshot du range courant (si dispo)
       const selection = window.getSelection();
-      const savedRange =
-        selection && selection.rangeCount > 0 ? selection.getRangeAt(0).cloneRange() : null;
+      const savedRange = selection && selection.rangeCount > 0 ? selection.getRangeAt(0).cloneRange() : null;
 
       setTimeout(() => {
         if (!this.editorElement) return;
@@ -274,7 +272,7 @@ export class EditorCommandService {
 
     this.editor.on('transaction', () => this.refreshState());
     this.editor.on('selectionUpdate', () => this.refreshState());
-    this.editor.on('update', () => this.contentChanged.update((n) => n + 1));
+    this.editor.on('update', () => this.contentChanged.update(n => n + 1));
     this.refreshState();
     return this.editor;
   }
@@ -382,12 +380,7 @@ export class EditorCommandService {
     if (!url) {
       return;
     }
-    this.editor
-      ?.chain()
-      .focus()
-      .extendMarkRange('link')
-      .setLink({ href: url, target: '_blank', rel: 'noopener noreferrer' })
-      .run();
+    this.editor?.chain().focus().extendMarkRange('link').setLink({ href: url, target: '_blank', rel: 'noopener noreferrer' }).run();
   }
 
   unlink(): void {
@@ -452,10 +445,13 @@ export class EditorCommandService {
 
   /** Recompute the toolbar state snapshot from the live editor. */
   private refreshState(): void {
+    console.log('refreshState')
+
     const editor = this.editor;
     if (!editor) {
       return;
     }
+    console.log('refreshState editor')
 
     const align =
       (editor.getAttributes('paragraph')['textAlign'] as string | undefined) ??
@@ -476,6 +472,7 @@ export class EditorCommandService {
     } else if (editor.isActive('codeBlock')) {
       block = 'pre';
     }
+    console.log('refreshState block', JSON.stringify(this.state()))
 
     this.state.set({
       bold: editor.isActive('bold'),
