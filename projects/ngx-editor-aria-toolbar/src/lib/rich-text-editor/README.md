@@ -12,6 +12,11 @@ JHipster app, and no hard dependency on `@ngx-translate/core`. The
 template to follow when extracting this folder into a standalone npm
 package — it is the one place that understands the host app's i18n
 infrastructure.
+## Why this library?
+
+Tiptap + Angular Aria toolbar causes focus issues.
+
+This library fixes that.
 
 ## Install & import
 
@@ -113,6 +118,41 @@ All colours and spacings come from the component's own `rich-text-editor.scss`
 / `editor-toolbar.scss`. There are no Bootstrap or JHipster class hooks —
 consumers style the component via ordinary CSS cascade (the selectors are
 `.rich-text-editor`, `.editor-toolbar`, `.rte-*`, `.tb-*`).
+
+## Focus Management (Angular Aria Toolbar Hack)
+
+When using `@angular/aria/toolbar` with a `contenteditable` surface (like TipTap), clicking a toolbar button normally causes the editor to lose focus *before* the command is executed. This collapses the text selection, preventing formatting from being applied.
+
+To solve this, this library implements a two-part coordination hack:
+
+1.  **Mousedown Prevention**: In `EditorToolbarComponent`, we `preventDefault()` on `mousedown` for all buttons. This stops the browser from transferring focus away from the editor.
+    ```ts
+    onToolbarMouseDown(event: MouseEvent): void {
+      if ((event.target as HTMLElement).closest('button')) {
+        event.preventDefault();
+      }
+    }
+    ```
+
+2.  **Focus Restoration Guard**: Since `Angular Aria`'s internal logic still calls `.focus()` programmatically on the clicked widget, we use a guard in `EditorCommandService`. We "arm" the guard on `pointerdown`, and if a `focusout` occurs towards the toolbar, we bounce the focus back to the editor in the next microtask (`setTimeout(0)`), restoring the previous selection.
+    ```ts
+    // In EditorToolbarComponent
+    onToolbarPointerDown() {
+      this.editor.armToolbarFocusSteal();
+    }
+
+    // In EditorCommandService
+    this.editorElement.addEventListener('focusout', (event) => {
+      if (!this.expectingToolbarSteal) return;
+      if (event.relatedTarget?.closest('[ngToolbar]')) {
+        const savedRange = window.getSelection()?.getRangeAt(0).cloneRange();
+        setTimeout(() => {
+          this.editorElement.focus();
+          // Restore range...
+        }, 0);
+      }
+    });
+    ```
 
 ## Roadmap / not in scope
 
