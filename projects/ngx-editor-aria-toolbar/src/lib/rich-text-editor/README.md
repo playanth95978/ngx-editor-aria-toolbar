@@ -2,11 +2,6 @@
 
 Signals-first WYSIWYG + HTML + Preview editor built on the new
 [`@angular/aria/toolbar`](https://angular.dev/guide/aria/toolbar) primitives
-and a hand-rolled `Selection` / `Range` command engine with a custom
-undo/redo stack. No `document.execCommand`. No third-party deps beyond the
-Angular framework. Apple / Google Docs-style "fluid caret" behaviour: click a
-format button with a collapsed caret and the focus stays in the editor so
-the next keystroke applies the format immediately.
 
 This folder is laid out as a **library-ready** module. It has a
 [`public-api.ts`](./public-api.ts) barrel, no coupling to the surrounding
