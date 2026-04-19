@@ -6,17 +6,17 @@
   @if (cfg.showHeader) {
     <header class="rte-header">
       <div>
-        <h1 class="rte-title">{{ t.title }}</h1>
-        <p class="rte-subtitle">{{ t.subtitle }}</p>
+        <h1>{{ t.title }}</h1>
+        <p>{{ t.subtitle }}</p>
       </div>
       @if (cfg.modes.length > 1) {
-        <div aria-label="Editor mode" class="rte-modes" role="tablist">
+        <div aria-label="Editor mode" class="rte-mode-switch" role="tablist">
           @if (isModeEnabled('wysiwyg')) {
             <button
               (click)="switchMode('wysiwyg')"
               [attr.aria-selected]="currentMode === 'wysiwyg'"
               [class.active]="currentMode === 'wysiwyg'"
-              class="mode-btn"
+              class="rte-mode-btn"
               role="tab"
               type="button"
             >
@@ -28,7 +28,7 @@
               (click)="switchMode('html')"
               [attr.aria-selected]="currentMode === 'html'"
               [class.active]="currentMode === 'html'"
-              class="mode-btn"
+              class="rte-mode-btn"
               role="tab"
               type="button"
             >
@@ -40,7 +40,7 @@
               (click)="switchMode('preview')"
               [attr.aria-selected]="currentMode === 'preview'"
               [class.active]="currentMode === 'preview'"
-              class="mode-btn"
+              class="rte-mode-btn"
               role="tab"
               type="button"
             >
@@ -54,56 +54,57 @@
 
   <jhi-editor-toolbar (clearRequested)="clearAll()" [i18n]="i18n()" [sections]="cfg.toolbar"></jhi-editor-toolbar>
 
-  <div class="rte-surface">
-    <div
-      #editor
-      [hidden]="currentMode !== 'wysiwyg'"
-      aria-label="Rich text content"
-      aria-multiline="true"
-      class="rte-editor"
-      role="textbox"
-      spellcheck="true"
-    ></div>
+  <div class="rte-panes">
+    <div #editor [hidden]="currentMode !== 'wysiwyg'" class="rte-wysiwyg"></div>
 
-    <div class="rte-html-wrapper" [hidden]="currentMode !== 'html'">
-      <label class="visually-hidden" for="htmlSource">{{ t.modes.html }}</label>
-      <textarea (input)="onHtmlInput($event)" [value]="htmlContent()" class="rte-html" id="htmlSource" spellcheck="false"></textarea>
-      <button (click)="applyHtml()" class="btn-secondary" type="button">
-        <span>{{ t.actions.applyHtml }}</span>
-      </button>
-    </div>
+    <textarea
+      (input)="onHtmlInput($event)"
+      [hidden]="currentMode !== 'html'"
+      [value]="htmlContent()"
+      aria-label="HTML source"
+      class="rte-html"
+      spellcheck="false"
+    ></textarea>
 
-    <article [innerHTML]="htmlContent()" class="rte-preview" [hidden]="currentMode !== 'preview'"></article>
+    <div [hidden]="currentMode !== 'preview'" [innerHTML]="htmlContent()" class="rte-preview"></div>
   </div>
 
   @if (cfg.showFooter) {
     <footer class="rte-footer">
-      <div aria-live="polite" class="counters">
+      <div class="rte-actions">
+        @if (cfg.showCopyButton) {
+          <button (click)="copyHtml()" class="rte-action-btn" type="button">
+            <span>{{ t.actions.copyHtml }}</span>
+          </button>
+        }
+        @if (cfg.showSaveButton) {
+          <button (click)="saveDraft()" class="rte-action-btn" type="button">
+            <span>{{ t.actions.save }}</span>
+          </button>
+        }
+        @if (currentMode === 'html') {
+          <button (click)="applyHtml()" class="rte-action-btn" type="button">
+            <span>{{ t.actions.applyHtml }}</span>
+          </button>
+        }
+      </div>
+
+      <div aria-live="polite" class="rte-stats">
         <span>
           <strong>{{ wordCount() }}</strong>
           <span>{{ t.stats.words }}</span>
         </span>
+        <span>·</span>
         <span>
           <strong>{{ charCount() }}</strong>
           <span>{{ t.stats.characters }}</span>
         </span>
         @if (savedAt(); as d) {
+          <span>·</span>
           <span class="saved-at">
             <span>{{ t.stats.savedAt }}</span>
             {{ d | date: 'mediumTime' }}
           </span>
-        }
-      </div>
-      <div class="actions">
-        @if (cfg.showCopyButton) {
-          <button (click)="copyHtml()" class="btn-secondary" type="button">
-            <span>{{ t.actions.copyHtml }}</span>
-          </button>
-        }
-        @if (cfg.showSaveButton) {
-          <button (click)="saveDraft()" class="btn-primary" type="button">
-            <span>{{ t.actions.save }}</span>
-          </button>
         }
       </div>
     </footer>
