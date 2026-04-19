@@ -174,67 +174,6 @@ export class EditorCommandService {
     this.boundFocusOut = null;
   }
 
-  // registerEditor(element: HTMLElement): void {
-  //   if (this.editorElement && this.editorElement !== element && this.boundInput) {
-  //     this.editorElement.removeEventListener('input', this.boundInput);
-  //   }
-  //   if (this.editorElement && this.editorElement !== element && this.boundFocusOut) {
-  //     this.editorElement.removeEventListener('focusout', this.boundFocusOut);
-  //   }
-  //   this.boundInput ??= (): void => this.onInput();
-  //   this.boundFocusOut ??= (event: Event): void => this.onEditorFocusOut(event as FocusEvent);
-  //   if (!this.boundSelectionChange) {
-  //     const handler: EventListener = (): void => this.onSelectionChange();
-  //     this.boundSelectionChange = handler;
-  //     document.addEventListener('selectionchange', handler);
-  //   }
-  //   this.editorElement = element;
-  //   this.savedRange = null;
-  //   this.undoStack = [element.innerHTML];
-  //   this.redoStack = [];
-  //   element.addEventListener('input', this.boundInput);
-  //   element.addEventListener('focusout', this.boundFocusOut);
-  // }
-  //
-  // private onEditorFocusOut(event: FocusEvent): void {
-  //   if (!this.expectingToolbarSteal) {
-  //     return;
-  //   }
-  //   const related = event.relatedTarget as Element | null;
-  //   if (!related?.closest('[ngToolbar]')) {
-  //     return;
-  //   }
-  //   const savedRange = this.savedRange ? this.savedRange.cloneRange() : null;
-  //   setTimeout(() => {
-  //     if (!this.editorElement) {
-  //       return;
-  //     }
-  //     // If focus has landed somewhere genuinely outside both the editor
-  //     // and the toolbar in the meantime (e.g. user clicked elsewhere on
-  //     // the page), leave it alone — don't hijack their intent.
-  //     const active = document.activeElement;
-  //     const inEditor = active === this.editorElement;
-  //     const inToolbar = active instanceof Element && active.closest('[ngToolbar]') !== null;
-  //     if (!inEditor && !inToolbar) {
-  //       return;
-  //     }
-  //     this.editorElement.focus();
-  //     if (!savedRange) {
-  //       return;
-  //     }
-  //     const selection = window.getSelection();
-  //     if (!selection) {
-  //       return;
-  //     }
-  //     selection.removeAllRanges();
-  //     try {
-  //       selection.addRange(savedRange);
-  //     } catch {
-  //       // Saved range may reference detached nodes after a structural
-  //       // edit; the focus() call alone is enough to keep typing going.
-  //     }
-  //   }, 0);
-  // }
 
   /**
    * Mount a TipTap editor on the given host element with `initialContent`.
@@ -283,6 +222,7 @@ export class EditorCommandService {
       this.editor.destroy();
       this.editor = null;
     }
+    this.cleanupEditorElement();
     this.state.set(INITIAL_STATE);
   }
 

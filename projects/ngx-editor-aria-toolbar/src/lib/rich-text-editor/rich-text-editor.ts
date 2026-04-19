@@ -10,6 +10,7 @@ import {
   HostListener,
   inject,
   input,
+  OnDestroy,
   type OnInit,
   output,
   signal,
@@ -50,7 +51,9 @@ const STORAGE_KEY = 'rich-text-editor.draft';
   ],
   imports: [CommonModule, EditorToolbarComponent],
 })
-export default class RichTextEditorComponent implements OnInit, AfterViewInit, ControlValueAccessor {
+export default class RichTextEditorComponent
+  implements OnInit, AfterViewInit, ControlValueAccessor, OnDestroy
+{
   /** HTML to display on first render. Consumers can pass either plain text or a full fragment. */
   readonly initialValue = input<string>('');
 
@@ -106,6 +109,9 @@ export default class RichTextEditorComponent implements OnInit, AfterViewInit, C
         this.onChange(html);
       }
     });
+  }
+  ngOnDestroy(): void {
+    this.editor.destroy();
   }
 
   /**
@@ -191,7 +197,8 @@ export default class RichTextEditorComponent implements OnInit, AfterViewInit, C
   }
 
   saveDraft(): void {
-    const html = this.mode() === 'wysiwyg' && this.editorMounted ? this.editor.getHTML() : this.htmlContent();
+    const html =
+      this.mode() === 'wysiwyg' && this.editorMounted ? this.editor.getHTML() : this.htmlContent();
     try {
       localStorage.setItem(STORAGE_KEY, html);
       this.htmlContent.set(html);
@@ -203,7 +210,8 @@ export default class RichTextEditorComponent implements OnInit, AfterViewInit, C
   }
 
   copyHtml(): void {
-    const html = this.mode() === 'wysiwyg' && this.editorMounted ? this.editor.getHTML() : this.htmlContent();
+    const html =
+      this.mode() === 'wysiwyg' && this.editorMounted ? this.editor.getHTML() : this.htmlContent();
     void navigator.clipboard.writeText(html);
   }
 
