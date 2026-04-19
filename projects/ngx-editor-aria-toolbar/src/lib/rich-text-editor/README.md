@@ -21,51 +21,35 @@ This library fixes that.
 ## Install & import
 
 ```ts
-import { RichTextEditorComponent, type RichTextEditorConfig, type RichTextEditorI18n } from 'app/rich-text-editor/public-api';
+import { RichTextEditorComponent, type RichTextEditorConfig, type RichTextEditorI18n } from 'ngx-editor-aria-toolbar';
 
 @Component({
-  imports: [RichTextEditorComponent],
+  imports: [RichTextEditorComponent, FormsModule, ReactiveFormsModule],
   template: `
-    <jhi-rich-text-editor
-      [initialValue]="draft"
-      [config]="config"
-      [i18n]="labels"
-      (contentChange)="onChange($event)"
-      (draftSaved)="persist($event)"
-    ></jhi-rich-text-editor>
+    <!-- Usage with ngModel -->
+    <jhi-rich-text-editor [(ngModel)]="content"></jhi-rich-text-editor>
+
+    <!-- Usage with Reactive Forms -->
+    <form [formGroup]="form">
+      <jhi-rich-text-editor formControlName="body"></jhi-rich-text-editor>
+    </form>
   `,
 })
 export class MyHostComponent {
-  draft = '<p>Hello <strong>world</strong>.</p>';
-
-  config: RichTextEditorConfig = {
-    modes: ['wysiwyg', 'preview'],
-    showHeader: false,
-    toolbar: { colors: false, insert: false },
-  };
-
-  labels: Partial<RichTextEditorI18n> = {
-    actions: { save: 'Save my post' },
-  };
-
-  onChange(html: string) {
-    /* … */
-  }
-  persist(html: string) {
-    /* … */
-  }
+  content = '<p>Hello world</p>';
+  form = new FormGroup({
+    body: new FormControl('Initial content')
+  });
 }
 ```
 
-The component ships with English defaults, so the `i18n` input is fully
-optional. The `config` input is optional too; omitting it renders the full
-toolbar with all three modes, the default storage key, etc.
+The component implements `ControlValueAccessor`, making it fully compatible with Angular Forms (`ngModel`, `formControl`, `formControlName`).
 
 ## Public API
 
 | Export                                                          | Description                                                                                                                              |
 | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `RichTextEditorComponent`                                       | Main standalone component. Inputs: `initialValue`, `config`, `i18n`. Outputs: `contentChange`, `draftSaved`.                             |
+| `RichTextEditorComponent`                                       | Main standalone component. Implements `ControlValueAccessor`. Inputs: `initialValue`, `config`, `i18n`. Outputs: `contentChange`, `draftSaved`. |
 | `EditorToolbarComponent`                                        | Standalone toolbar. Usable on its own if you want to render the editor surface yourself — wire it to an `EditorCommandService` instance. |
 | `EditorCommandService`                                          | The command engine. Inject in a host and call `registerEditor(divEl)`, then `toggleBold()` / `setBlock('h1')` / `unorderedList()` / …    |
 | `BlockFormat`, `EditorState`                                    | Types exposed by the service.                                                                                                            |

@@ -6,6 +6,7 @@ import {
   DestroyRef,
   effect,
   ElementRef,
+  forwardRef,
   HostListener,
   inject,
   input,
@@ -16,6 +17,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { EditorToolbarComponent } from './components/editor-toolbar/editor-toolbar';
 import { EditorCommandService } from './services/editor-command.service';
@@ -38,10 +40,17 @@ const STORAGE_KEY = 'rich-text-editor.draft';
   styleUrl: './rich-text-editor.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
-  providers: [EditorCommandService],
+  providers: [
+    EditorCommandService,
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => RichTextEditorComponent),
+      multi: true,
+    },
+  ],
   imports: [CommonModule, EditorToolbarComponent],
 })
-export default class RichTextEditorComponent implements OnInit, AfterViewInit {
+export default class RichTextEditorComponent implements OnInit, AfterViewInit, ControlValueAccessor {
   /** HTML to display on first render. Consumers can pass either plain text or a full fragment. */
   readonly initialValue = input<string>('');
 
@@ -82,13 +91,19 @@ export default class RichTextEditorComponent implements OnInit, AfterViewInit {
   private lastRegisteredElement: HTMLDivElement | null = null;
   private editorMounted = false;
 
+  private onChange: (value: string) => void = () => {};
+  private onTouched: () => void = () => {};
+  protected isDisabled = signal<boolean>(false);
+
   constructor() {
     // Keep `htmlContent` in sync with TipTap so `switchMode` can round-trip
     // HTML without pulling from the editor imperatively.
     effect(() => {
       this.editor.contentChanged();
       if (this.mode() === 'wysiwyg' && this.editorMounted) {
-        this.htmlContent.set(this.editor.getHTML());
+        const html = this.editor.getHTML();
+        this.htmlContent.set(html);
+        this.onChange(html);
       }
     });
   }
@@ -141,15 +156,38 @@ export default class RichTextEditorComponent implements OnInit, AfterViewInit {
     this.mode.set(mode);
   }
 
-  applyHtml(): void {
-    if (this.editorMounted) {
-      this.editor.setContent(this.htmlContent());
-    }
-  }
-
   onHtmlInput(value: Event): void {
     const v = (value.target as HTMLInputElement).value;
     this.htmlContent.set(v);
+    this.onChange(v);
+  }
+
+  applyHtml(): void {
+    if (this.editorMounted) {
+      this.editor.setContent(this.htmlContent());
+      this.onChange(this.htmlContent());
+    }
+  }
+
+  writeValue(value: string | null): void {
+    const content = value ?? '';
+    this.htmlContent.set(content);
+    if (this.editorMounted && this.mode() === 'wysiwyg') {
+      this.editor.setContent(content);
+    }
+  }
+
+  registerOnChange(fn: (value: string) => void): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.isDisabled.set(isDisabled);
+    // Note: TipTap editor editable state can also be toggled here if needed
   }
 
   saveDraft(): void {
