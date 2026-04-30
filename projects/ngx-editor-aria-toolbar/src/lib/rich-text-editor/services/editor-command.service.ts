@@ -7,6 +7,15 @@ import { TextStyle } from '@tiptap/extension-text-style';
 import { Color } from '@tiptap/extension-color';
 import Highlight from '@tiptap/extension-highlight';
 import Image from '@tiptap/extension-image';
+import Subscript from '@tiptap/extension-subscript';
+import Superscript from '@tiptap/extension-superscript';
+import TaskList from '@tiptap/extension-task-list';
+import TaskItem from '@tiptap/extension-task-item';
+import Table from '@tiptap/extension-table';
+import TableRow from '@tiptap/extension-table-row';
+import TableCell from '@tiptap/extension-table-cell';
+import TableHeader from '@tiptap/extension-table-header';
+import Code from '@tiptap/extension-code';
 
 /**
  * Supported block formats for the block-format `<select>` in the toolbar.
@@ -16,6 +25,8 @@ import Image from '@tiptap/extension-image';
  * which is what the native `<select>` control emits.
  */
 export type BlockFormat = 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'blockquote' | 'pre';
+
+export type SubSuperScript = 'subscript' | 'superscript';
 
 /**
  * Toolbar-facing snapshot of the editor state.
@@ -38,6 +49,8 @@ export interface EditorState {
   foreColor: string;
   backColor: string;
   block: BlockFormat;
+  subscript: boolean;
+  superscript: boolean;
 }
 
 const INITIAL_STATE: EditorState = {
@@ -54,6 +67,8 @@ const INITIAL_STATE: EditorState = {
   foreColor: '#000000',
   backColor: '#ffff00',
   block: 'p',
+  subscript: false,
+  superscript: false,
 };
 
 /**
@@ -203,6 +218,17 @@ export class EditorCommandService {
           inline: false,
           allowBase64: false,
         }),
+        Subscript,
+        Superscript,
+        TaskList,
+        TaskItem,
+        Table.configure({
+          resizable: true,
+        }),
+        TableRow,
+        TableCell,
+        TableHeader,
+        Code,
       ],
       content: initialContent || '<p></p>',
       autofocus: false,
@@ -279,6 +305,18 @@ export class EditorCommandService {
 
   toggleStrikeThrough(): void {
     this.editor?.chain().focus().toggleStrike().run();
+  }
+
+  toggleSubscript(): void {
+    this.editor?.chain().focus().toggleSubscript().run();
+  }
+
+  toggleSuperscript(): void {
+    this.editor?.chain().focus().toggleSuperscript().run();
+  }
+
+  toggleTaskList(): void {
+    this.editor?.chain().focus().toggleTaskList().run();
   }
 
   setAlignment(side: Alignment): void {
@@ -428,6 +466,8 @@ export class EditorCommandService {
       foreColor: (editor.getAttributes('textStyle')['color'] as string | undefined) ?? '#000000',
       backColor: (editor.getAttributes('highlight')['color'] as string | undefined) ?? '#ffff00',
       block,
+      subscript: editor.isActive('subscript'),
+      superscript: editor.isActive('superscript'),
     });
   }
 }
