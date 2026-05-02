@@ -47,8 +47,6 @@
   }
 
   @if (v.inline) {
-    {{ s.bold }}
-
     <div aria-label="Inline formatting" class="group">
       <button
         #bold="ngToolbarWidget"
@@ -66,7 +64,7 @@
       <button
         #italic="ngToolbarWidget"
         (click)="editor.toggleItalic()"
-        [attr.aria-pressed]="s.italic "
+        [attr.aria-pressed]="s.italic"
         aria-label="Italic"
         class="tb-btn"
         ngToolbarWidget
@@ -79,7 +77,7 @@
       <button
         #underline="ngToolbarWidget"
         (click)="editor.toggleUnderline()"
-        [attr.aria-pressed]="s.underline "
+        [attr.aria-pressed]="s.underline"
         aria-label="Underline"
         class="tb-btn"
         ngToolbarWidget
@@ -92,7 +90,7 @@
       <button
         #strike="ngToolbarWidget"
         (click)="editor.toggleStrikeThrough()"
-        [attr.aria-pressed]="s.strikeThrough "
+        [attr.aria-pressed]="s.strikeThrough"
         aria-label="Strikethrough"
         class="tb-btn"
         ngToolbarWidget
@@ -102,6 +100,34 @@
       >
         <s aria-hidden="true">S</s>
       </button>
+      @if (v.subSuperScript) {
+        <button
+          #subscript="ngToolbarWidget"
+          (click)="editor.toggleSubscript()"
+          [attr.aria-pressed]="s.subscript"
+          aria-label="Subscript"
+          class="tb-btn"
+          ngToolbarWidget
+          title="Subscript"
+          type="button"
+          value="subscript"
+        >
+          <span aria-hidden="true">x₂</span>
+        </button>
+        <button
+          #superscript="ngToolbarWidget"
+          (click)="editor.toggleSuperscript()"
+          [attr.aria-pressed]="s.superscript"
+          aria-label="Superscript"
+          class="tb-btn"
+          ngToolbarWidget
+          title="Superscript"
+          type="button"
+          value="superscript"
+        >
+          <span aria-hidden="true">x²</span>
+        </button>
+      }
     </div>
   }
 
@@ -114,7 +140,7 @@
       <button
         #alignLeft="ngToolbarWidget"
         (click)="editor.setAlignment('Left')"
-        [attr.aria-checked]="s.alignLeft "
+        [attr.aria-checked]="s.alignLeft"
         aria-label="Align left"
         class="tb-btn"
         ngToolbarWidget
@@ -128,7 +154,7 @@
       <button
         #alignCenter="ngToolbarWidget"
         (click)="editor.setAlignment('Center')"
-        [attr.aria-checked]="s.alignCenter "
+        [attr.aria-checked]="s.alignCenter"
         aria-label="Align center"
         class="tb-btn"
         ngToolbarWidget
@@ -142,7 +168,7 @@
       <button
         #alignRight="ngToolbarWidget"
         (click)="editor.setAlignment('Right')"
-        [attr.aria-checked]="s.alignRight "
+        [attr.aria-checked]="s.alignRight"
         aria-label="Align right"
         class="tb-btn"
         ngToolbarWidget
@@ -156,7 +182,7 @@
       <button
         #alignJustify="ngToolbarWidget"
         (click)="editor.setAlignment('Justify')"
-        [attr.aria-checked]="s.alignJustify "
+        [attr.aria-checked]="s.alignJustify"
         aria-label="Justify"
         class="tb-btn"
         ngToolbarWidget
@@ -179,7 +205,7 @@
       <button
         #ul="ngToolbarWidget"
         (click)="editor.unorderedList()"
-        [attr.aria-pressed]="s.unorderedList "
+        [attr.aria-pressed]="s.unorderedList"
         aria-label="Bulleted list"
         class="tb-btn"
         ngToolbarWidget
@@ -192,7 +218,7 @@
       <button
         #ol="ngToolbarWidget"
         (click)="editor.orderedList()"
-        [attr.aria-pressed]="s.orderedList "
+        [attr.aria-pressed]="s.orderedList"
         aria-label="Numbered list"
         class="tb-btn"
         ngToolbarWidget
@@ -224,10 +250,88 @@
       >
         <span aria-hidden="true">⇥</span>
       </button>
+      @if (v.taskList) {
+        <button
+          #taskList="ngToolbarWidget"
+          (click)="editor.toggleTaskList()"
+          [attr.aria-pressed]="s.orderedList"
+          aria-label="Task list"
+          class="tb-btn"
+          ngToolbarWidget
+          title="Task list"
+          type="button"
+          value="task-list"
+        >
+          <span aria-hidden="true">☑</span>
+        </button>
+      }
     </div>
   }
 
-  @if (v.lists && v.colors) {
+  @if (v.lists && v.table) {
+    <div aria-orientation="vertical" class="separator" role="separator"></div>
+  }
+
+  @if (v.table) {
+    <div aria-label="Table" class="group">
+      <button
+        (click)="editor.insertTable(3, 3)"
+        aria-label="Insert table"
+        class="tb-btn"
+        ngToolbarWidget
+        title="Insert table"
+        type="button"
+        value="table"
+      >
+        <span aria-hidden="true">🔲</span>
+      </button>
+    </div>
+  }
+
+  @if (v.table && v.code) {
+    <div aria-orientation="vertical" class="separator" role="separator"></div>
+  }
+
+  @if (v.code) {
+    <div aria-label="Inline code" class="group">
+      <button
+        #code="ngToolbarWidget"
+        (click)="editor.toggleCode()"
+        [attr.aria-pressed]="s.bold"
+        aria-label="Inline code"
+        class="tb-btn"
+        ngToolbarWidget
+        title="Inline code"
+        type="button"
+        value="code"
+      >
+        <span aria-hidden="true">&lt;/&gt;</span>
+      </button>
+    </div>
+  }
+
+  @if (v.code && v.emoji) {
+    <div aria-orientation="vertical" class="separator" role="separator"></div>
+  }
+
+  @if (v.emoji) {
+    <div aria-label="Emoji" class="group">
+      <button
+        #emoji="ngToolbarWidget"
+        (click)="insertEmoji()"
+        aria-label="Insert emoji"
+        class="tb-btn"
+        ngToolbarWidget
+        title="Insert emoji"
+        type="button"
+        value="emoji"
+      >
+        <span aria-hidden="true">😊</span>
+      </button>
+    </div>
+  }
+
+  @if (v.emoji && v.colors) {
     <div aria-orientation="vertical" class="separator" role="separator"></div>
   }
 

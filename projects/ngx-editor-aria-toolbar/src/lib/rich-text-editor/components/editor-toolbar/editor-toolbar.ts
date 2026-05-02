@@ -14,7 +14,7 @@ import { type DeepPartial, DEFAULT_CONFIG, DEFAULT_I18N, mergeI18n, RichTextEdit
   imports: [Toolbar, ToolbarWidget, ToolbarWidgetGroup, FormsModule, Toolbar, ToolbarWidget],
 })
 export class EditorToolbarComponent {
-  readonly clearRequested = output();
+  readonly clearRequested = output<void>();
 
   /** Which sections of the toolbar to render. Defaults to everything on. */
   readonly sections = input<ToolbarSections>(DEFAULT_CONFIG.toolbar);
@@ -44,6 +44,8 @@ export class EditorToolbarComponent {
       { value: 'pre', label: t.pre },
     ];
   });
+
+  readonly taskListActive = computed(() => this.state().orderedList);
 
   /**
    * Preserve the contentEditable selection when a toolbar button is clicked.
@@ -107,6 +109,13 @@ export class EditorToolbarComponent {
     const url = window.prompt(this.labels().prompts.imageUrl);
     if (url) {
       this.editor.insertImage(url);
+    }
+  }
+
+  insertEmoji(): void {
+    const emoji = window.prompt(this.labels().toolbar.emoji);
+    if (emoji) {
+      this.editor?.chain().focus().insertContent(emoji).run();
     }
   }
 

@@ -28,6 +28,11 @@ export interface ToolbarSections {
   colors?: boolean;
   insert?: boolean;
   utilities?: boolean;
+  taskList?: boolean;
+  table?: boolean;
+  code?: boolean;
+  emoji?: boolean;
+  subSuperScript?: boolean;
 }
 
 export interface RichTextEditorConfig {
@@ -119,6 +124,11 @@ export const DEFAULT_I18N: RichTextEditorI18n = {
       blockquote: 'Blockquote',
       pre: 'Code block',
     },
+    taskList: 'Task list',
+    table: 'Table',
+    code: 'Inline code',
+    emoji: 'Emoji',
+    subSuperScript: 'Sub/Superscript',
   },
   prompts: {
     linkUrl: 'URL',
@@ -155,6 +165,11 @@ export const DEFAULT_CONFIG: Required<Omit<RichTextEditorConfig, 'toolbar' | 'st
     colors: true,
     insert: true,
     utilities: true,
+    taskList: true,
+    table: true,
+    code: true,
+    emoji: true,
+    subSuperScript: true,
   },
 };
 
