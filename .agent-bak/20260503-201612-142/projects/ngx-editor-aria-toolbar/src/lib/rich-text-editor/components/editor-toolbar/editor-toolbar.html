@@ -327,44 +327,6 @@
       >
         <span aria-hidden="true">🗑</span>
       </button>
-    </button>
-  }
-
-  @if (v.zoom) {
-    <div aria-label="Zoom" class="group">
-      <button
-        (click)="onDecreaseZoom()"
-        aria-label="Decrease zoom"
-        class="tb-btn"
-        ngToolbarWidget
-        title="Decrease zoom"
-        type="button"
-        value="zoom-out"
-      >
-        <span aria-hidden="true">-</span>
-      </button>
-      <button
-        (click)="onResetZoom()"
-        aria-label="Reset zoom"
-        class="tb-btn"
-        ngToolbarWidget
-        title="Reset zoom"
-        type="button"
-        value="zoom-reset"
-      >
-        <span aria-hidden="true">🔍</span>
-      </button>
-      <button
-        (click)="onIncreaseZoom()"
-        aria-label="Increase zoom"
-        class="tb-btn"
-        ngToolbarWidget
-        title="Increase zoom"
-        type="button"
-        value="zoom-in"
-      >
-        <span aria-hidden="true">+</span>
-      </button>
     </div>
   }
 </div>

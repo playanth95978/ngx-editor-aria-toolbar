@@ -125,20 +125,4 @@ export class EditorToolbarComponent {
   onClearAll(): void {
     this.clearRequested.emit();
   }
-
-  onZoomChange(zoom: number): void {
-    this.editor.state.update(s => ({ ...s, zoom }));
-  }
-
-  onIncreaseZoom(): void {
-    this.editor.increaseZoom();
-  }
-
-  onDecreaseZoom(): void {
-    this.editor.decreaseZoom();
-  }
-
-  onResetZoom(): void {
-    this.editor.resetZoom();
-  }
 }

@@ -156,7 +156,6 @@ export const DEFAULT_CONFIG: Required<Omit<RichTextEditorConfig, 'toolbar' | 'st
     colors: true,
     insert: true,
     utilities: true,
-    zoom: true,
   },
 };
 
@@ -202,7 +201,6 @@ export function mergeI18n(override: DeepPartial<RichTextEditorI18n> | undefined)
       foreColor: override.toolbar?.foreColor ?? DEFAULT_I18N.toolbar.foreColor,
       backColor: override.toolbar?.backColor ?? DEFAULT_I18N.toolbar.backColor,
       block: { ...DEFAULT_I18N.toolbar.block, ...stripUndefined(override.toolbar?.block) },
-      zoom: override.toolbar?.zoom ?? DEFAULT_CONFIG.toolbar.zoom,
     },
     prompts: { ...DEFAULT_I18N.prompts, ...stripUndefined(override.prompts) },
     actions: { ...DEFAULT_I18N.actions, ...stripUndefined(override.actions) },

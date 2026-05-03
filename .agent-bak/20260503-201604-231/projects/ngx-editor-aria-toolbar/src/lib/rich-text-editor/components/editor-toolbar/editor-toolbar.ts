@@ -45,18 +45,6 @@ export class EditorToolbarComponent {
     ];
   });
 
-  readonly zoomLevels = computed(() => {
-    const t = this.labels().toolbar;
-    return [
-      { value: 50, label: '50%' },
-      { value: 75, label: '75%' },
-      { value: 100, label: '100%' },
-      { value: 125, label: '125%' },
-      { value: 150, label: '150%' },
-      { value: 200, value: '200%' },
-    ];
-  });
-
   /**
    * Preserve the contentEditable selection when a toolbar button is clicked.
    *
@@ -124,21 +112,5 @@ export class EditorToolbarComponent {
 
   onClearAll(): void {
     this.clearRequested.emit();
-  }
-
-  onZoomChange(zoom: number): void {
-    this.editor.state.update(s => ({ ...s, zoom }));
-  }
-
-  onIncreaseZoom(): void {
-    this.editor.increaseZoom();
-  }
-
-  onDecreaseZoom(): void {
-    this.editor.decreaseZoom();
-  }
-
-  onResetZoom(): void {
-    this.editor.resetZoom();
   }
 }

@@ -38,7 +38,6 @@ export interface EditorState {
   foreColor: string;
   backColor: string;
   block: BlockFormat;
-  zoom: number;
 }
 
 const INITIAL_STATE: EditorState = {
@@ -55,7 +54,6 @@ const INITIAL_STATE: EditorState = {
   foreColor: '#000000',
   backColor: '#ffff00',
   block: 'p',
-  zoom: 100,
 };
 
 /**
@@ -340,18 +338,6 @@ export class EditorCommandService {
     this.editor?.chain().focus().setHorizontalRule().run();
   }
 
-  increaseZoom(): void {
-    this.state.update(s => ({ ...s, zoom: Math.min(s.zoom + 10, 200) }));
-  }
-
-  decreaseZoom(): void {
-    this.state.update(s => ({ ...s, zoom: Math.max(s.zoom - 10, 50) }));
-  }
-
-  resetZoom(): void {
-    this.state.update(s => ({ ...s, zoom: 100 }));
-  }
-
   /**
    * Strip all inline marks and reset the block-level nodes touched by the
    * current selection back to plain paragraphs. Equivalent to the old
@@ -442,7 +428,6 @@ export class EditorCommandService {
       foreColor: (editor.getAttributes('textStyle')['color'] as string | undefined) ?? '#000000',
       backColor: (editor.getAttributes('highlight')['color'] as string | undefined) ?? '#ffff00',
       block,
-      zoom: INITIAL_STATE.zoom,
     });
   }
 }
