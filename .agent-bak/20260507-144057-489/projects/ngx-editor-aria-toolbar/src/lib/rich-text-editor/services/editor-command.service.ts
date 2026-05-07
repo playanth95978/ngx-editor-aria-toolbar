@@ -275,10 +275,6 @@ export class EditorCommandService {
     return this.editor?.state.doc.textContent.length ?? 0;
   }
 
-  insertEmoji(emoji: string): void {
-    this.editor?.chain().focus().insertContent(emoji).run();
-  }
-
   /** Naive word count on the plain-text document. */
   getWordCount(): number {
     const text = this.editor?.state.doc.textContent ?? '';

@@ -53,30 +53,7 @@ export class EditorToolbarComponent {
       { value: 100, label: '100%' },
       { value: 125, label: '125%' },
       { value: 150, label: '150%' },
-      { value: 200, label: '200%' },
-    ];
-  });
-
-  readonly verticalAlignOptions = computed(() => {
-    const t = this.labels().toolbar;
-    return [
-      { value: 'baseline', label: 'Baseline' },
-      { value: 'sub', label: 'Subscript' },
-      { value: 'super', label: 'Superscript' },
-      { value: 'top', label: 'Top' },
-      { value: 'middle', label: 'Middle' },
-      { value: 'bottom', label: 'Bottom' },
-    ];
-  });
-
-  readonly emojiOptions = computed(() => {
-    return [
-      { value: '😀', label: 'Smile' },
-      { value: '😂', label: 'Laugh' },
-      { value: '😍', label: 'Love' },
-      { value: '👍', label: 'Thumbs up' },
-      { value: '🎉', label: 'Celebrate' },
-      { value: '🔥', label: 'Fire' },
+      { value: 200, value: '200%' },
     ];
   });
 
@@ -163,36 +140,5 @@ export class EditorToolbarComponent {
 
   onResetZoom(): void {
     this.editor.resetZoom();
-  }
-
-  onCodeBlockToggle(): void {
-    this.editor.toggleCodeBlock();
-  }
-
-  onTaskListToggle(): void {
-    this.editor.toggleTaskList();
-  }
-
-  onVerticalAlignChange(event: Event): void {
-    const target = event.target as HTMLSelectElement;
-    this.editor.setVerticalAlign(target.value);
-  }
-
-  onInsertTable(): void {
-    const size = window.prompt(this.labels().prompts.table);
-    if (size) {
-      const [rows, cols] = size.split('x').map(Number);
-      if (!isNaN(rows) && !isNaN(cols) && rows > 0 && cols > 0) {
-        this.editor.insertTable(rows, cols);
-      }
-    }
-  }
-
-  onExportHtml(): void {
-    this.editor.exportHtml();
-  }
-
-  onImportHtml(): void {
-    this.editor.importHtml();
   }
 }

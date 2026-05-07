@@ -164,35 +164,4 @@ export class EditorToolbarComponent {
   onResetZoom(): void {
     this.editor.resetZoom();
   }
-
-  onCodeBlockToggle(): void {
-    this.editor.toggleCodeBlock();
-  }
-
-  onTaskListToggle(): void {
-    this.editor.toggleTaskList();
-  }
-
-  onVerticalAlignChange(event: Event): void {
-    const target = event.target as HTMLSelectElement;
-    this.editor.setVerticalAlign(target.value);
-  }
-
-  onInsertTable(): void {
-    const size = window.prompt(this.labels().prompts.table);
-    if (size) {
-      const [rows, cols] = size.split('x').map(Number);
-      if (!isNaN(rows) && !isNaN(cols) && rows > 0 && cols > 0) {
-        this.editor.insertTable(rows, cols);
-      }
-    }
-  }
-
-  onExportHtml(): void {
-    this.editor.exportHtml();
-  }
-
-  onImportHtml(): void {
-    this.editor.importHtml();
-  }
 }

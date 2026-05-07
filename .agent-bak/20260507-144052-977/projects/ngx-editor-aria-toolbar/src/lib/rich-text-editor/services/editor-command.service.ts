@@ -215,19 +215,6 @@ export class EditorCommandService {
           types: ['heading', 'paragraph'],
           alignments: ['left', 'center', 'right', 'justify'],
         }),
-        Table.configure({
-          resizable: true,
-        }),
-        TableRow,
-        TableCell,
-        TableHeader,
-        CodeBlockLowlight.configure({
-          lowlight,
-        }),
-        TaskList,
-        TaskItem.configure({
-          nested: true,
-        }),
         Image.configure({
           inline: false,
           allowBase64: false,
@@ -273,10 +260,6 @@ export class EditorCommandService {
   /** Plain-text document length — used by the word/char counter. */
   getTextLength(): number {
     return this.editor?.state.doc.textContent.length ?? 0;
-  }
-
-  insertEmoji(emoji: string): void {
-    this.editor?.chain().focus().insertContent(emoji).run();
   }
 
   /** Naive word count on the plain-text document. */

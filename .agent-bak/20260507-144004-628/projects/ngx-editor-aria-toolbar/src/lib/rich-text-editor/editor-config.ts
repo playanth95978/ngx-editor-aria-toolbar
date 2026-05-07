@@ -155,26 +155,6 @@ export const DEFAULT_I18N: RichTextEditorI18n = {
     characters: ' characters',
     savedAt: 'Saved at',
   },
-  toolbar: {
-    table: 'Table',
-    code: 'Code',
-    emoji: 'Emoji',
-    verticalAlign: 'Vertical align',
-    taskList: 'Task list',
-    exportImport: 'Export/Import',
-  },
-  prompts: {
-    table: 'Enter table size (rows x columns)',
-    code: 'Enter code snippet',
-    emoji: 'Select an emoji',
-  },
-  actions: {
-    insertTable: 'Insert table',
-    insertCodeBlock: 'Insert code block',
-    insertEmoji: 'Insert emoji',
-    exportHtml: 'Export HTML',
-    importHtml: 'Import HTML',
-  },
 };
 
 export const DEFAULT_CONFIG: Required<Omit<RichTextEditorConfig, 'toolbar' | 'storageKey'>> & {

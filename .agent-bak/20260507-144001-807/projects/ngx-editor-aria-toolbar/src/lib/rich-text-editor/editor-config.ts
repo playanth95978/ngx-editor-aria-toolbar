@@ -155,26 +155,6 @@ export const DEFAULT_I18N: RichTextEditorI18n = {
     characters: ' characters',
     savedAt: 'Saved at',
   },
-  toolbar: {
-    table: 'Table',
-    code: 'Code',
-    emoji: 'Emoji',
-    verticalAlign: 'Vertical align',
-    taskList: 'Task list',
-    exportImport: 'Export/Import',
-  },
-  prompts: {
-    table: 'Enter table size (rows x columns)',
-    code: 'Enter code snippet',
-    emoji: 'Select an emoji',
-  },
-  actions: {
-    insertTable: 'Insert table',
-    insertCodeBlock: 'Insert code block',
-    insertEmoji: 'Insert emoji',
-    exportHtml: 'Export HTML',
-    importHtml: 'Import HTML',
-  },
 };
 
 export const DEFAULT_CONFIG: Required<Omit<RichTextEditorConfig, 'toolbar' | 'storageKey'>> & {
@@ -248,12 +228,6 @@ export function mergeI18n(override: DeepPartial<RichTextEditorI18n> | undefined)
       foreColor: override.toolbar?.foreColor ?? DEFAULT_I18N.toolbar.foreColor,
       backColor: override.toolbar?.backColor ?? DEFAULT_I18N.toolbar.backColor,
       block: { ...DEFAULT_I18N.toolbar.block, ...stripUndefined(override.toolbar?.block) },
-      table: override.toolbar?.table ?? 'Table',
-      code: override.toolbar?.code ?? 'Code',
-      emoji: override.toolbar?.emoji ?? 'Emoji',
-      verticalAlign: override.toolbar?.verticalAlign ?? 'Vertical align',
-      taskList: override.toolbar?.taskList ?? 'Task list',
-      exportImport: override.toolbar?.exportImport ?? 'Export/Import',
       zoom: override.toolbar?.zoom ?? DEFAULT_CONFIG.toolbar.zoom,
     },
     prompts: { ...DEFAULT_I18N.prompts, ...stripUndefined(override.prompts) },

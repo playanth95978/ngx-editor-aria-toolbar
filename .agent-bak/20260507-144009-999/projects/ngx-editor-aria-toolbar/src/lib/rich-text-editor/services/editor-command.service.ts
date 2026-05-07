@@ -7,14 +7,6 @@ import { TextStyle } from '@tiptap/extension-text-style';
 import { Color } from '@tiptap/extension-color';
 import Highlight from '@tiptap/extension-highlight';
 import Image from '@tiptap/extension-image';
-import Table from '@tiptap/extension-table';
-import TableRow from '@tiptap/extension-table-row';
-import TableCell from '@tiptap/extension-table-cell';
-import TableHeader from '@tiptap/extension-table-header';
-import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
-import { lowlight } from 'lowlight';
-import TaskList from '@tiptap/extension-task-list';
-import TaskItem from '@tiptap/extension-task-item';
 
 /**
  * Supported block formats for the block-format `<select>` in the toolbar.
@@ -67,9 +59,6 @@ const INITIAL_STATE: EditorState = {
   backColor: '#ffff00',
   block: 'p',
   zoom: 100,
-  codeBlock: false,
-  taskList: false,
-  verticalAlign: 'baseline',
 };
 
 /**
@@ -215,19 +204,6 @@ export class EditorCommandService {
           types: ['heading', 'paragraph'],
           alignments: ['left', 'center', 'right', 'justify'],
         }),
-        Table.configure({
-          resizable: true,
-        }),
-        TableRow,
-        TableCell,
-        TableHeader,
-        CodeBlockLowlight.configure({
-          lowlight,
-        }),
-        TaskList,
-        TaskItem.configure({
-          nested: true,
-        }),
         Image.configure({
           inline: false,
           allowBase64: false,
@@ -273,10 +249,6 @@ export class EditorCommandService {
   /** Plain-text document length — used by the word/char counter. */
   getTextLength(): number {
     return this.editor?.state.doc.textContent.length ?? 0;
-  }
-
-  insertEmoji(emoji: string): void {
-    this.editor?.chain().focus().insertContent(emoji).run();
   }
 
   /** Naive word count on the plain-text document. */
@@ -371,36 +343,6 @@ export class EditorCommandService {
     this.editor?.chain().focus().setHorizontalRule().run();
   }
 
-  toggleCodeBlock(): void {
-    this.editor?.chain().focus().toggleCodeBlock().run();
-  }
-
-  toggleTaskList(): void {
-    this.editor?.chain().focus().toggleTaskList().run();
-  }
-
-  setVerticalAlign(align: string): void {
-    this.editor?.chain().focus().setTextAlign(align).run();
-  }
-
-  insertTable(rows: number, cols: number): void {
-    this.editor?.chain().focus().insertTable({ rows, cols }).run();
-  }
-
-  exportHtml(): void {
-    const html = this.getHTML();
-    navigator.clipboard.writeText(html).then(() => {
-      alert('HTML exported to clipboard!');
-    });
-  }
-
-  importHtml(): void {
-    const html = prompt('Paste your HTML content:');
-    if (html) {
-      this.setContent(html, true);
-    }
-  }
-
   increaseZoom(): void {
     this.state.update(s => ({ ...s, zoom: Math.min(s.zoom + 10, 200) }));
   }
@@ -489,10 +431,6 @@ export class EditorCommandService {
     }
     console.log('refreshState block', JSON.stringify(this.state()))
 
-    const codeBlock = editor.isActive('codeBlock');
-    const taskList = editor.isActive('taskItem');
-    const verticalAlign = (editor.getAttributes('textStyle')['verticalAlign'] as string | undefined) ?? 'baseline';
-
     this.state.set({
       bold: editor.isActive('bold'),
       italic: editor.isActive('italic'),
@@ -508,9 +446,6 @@ export class EditorCommandService {
       backColor: (editor.getAttributes('highlight')['color'] as string | undefined) ?? '#ffff00',
       block,
       zoom: INITIAL_STATE.zoom,
-      codeBlock,
-      taskList,
-      verticalAlign,
     });
   }
 }

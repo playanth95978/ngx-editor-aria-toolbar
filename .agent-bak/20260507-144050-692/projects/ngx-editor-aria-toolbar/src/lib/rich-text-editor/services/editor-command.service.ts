@@ -7,14 +7,6 @@ import { TextStyle } from '@tiptap/extension-text-style';
 import { Color } from '@tiptap/extension-color';
 import Highlight from '@tiptap/extension-highlight';
 import Image from '@tiptap/extension-image';
-import Table from '@tiptap/extension-table';
-import TableRow from '@tiptap/extension-table-row';
-import TableCell from '@tiptap/extension-table-cell';
-import TableHeader from '@tiptap/extension-table-header';
-import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
-import { lowlight } from 'lowlight';
-import TaskList from '@tiptap/extension-task-list';
-import TaskItem from '@tiptap/extension-task-item';
 
 /**
  * Supported block formats for the block-format `<select>` in the toolbar.
@@ -215,19 +207,6 @@ export class EditorCommandService {
           types: ['heading', 'paragraph'],
           alignments: ['left', 'center', 'right', 'justify'],
         }),
-        Table.configure({
-          resizable: true,
-        }),
-        TableRow,
-        TableCell,
-        TableHeader,
-        CodeBlockLowlight.configure({
-          lowlight,
-        }),
-        TaskList,
-        TaskItem.configure({
-          nested: true,
-        }),
         Image.configure({
           inline: false,
           allowBase64: false,
@@ -273,10 +252,6 @@ export class EditorCommandService {
   /** Plain-text document length — used by the word/char counter. */
   getTextLength(): number {
     return this.editor?.state.doc.textContent.length ?? 0;
-  }
-
-  insertEmoji(emoji: string): void {
-    this.editor?.chain().focus().insertContent(emoji).run();
   }
 
   /** Naive word count on the plain-text document. */
